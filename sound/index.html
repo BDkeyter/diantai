@@ -1,0 +1,1380 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <title>声匠工作室 | SoundCraft Studio</title>
+  <meta name="description" content="SoundCraft Studio · 高端配音制作与人才招募平台" />
+  
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* --- CSS FROM styles.css (Adapted) --- */
+    :root{
+      --bg:#0A0A0A;
+      --panel:rgba(18,18,18,.72);
+      --panel2:rgba(18,18,18,.9);
+      --line:rgba(255,255,255,.08);
+      --text:#EDEDED;
+      --muted:rgba(237,237,237,.72);
+      --gold:#D4AF37;
+      --red:#DC2626;
+      --shadow: 0 20px 60px rgba(0,0,0,.55);
+      --radius: 18px;
+      --radius2: 26px;
+      --max: 1120px;
+      --font: "Noto Sans SC", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    }
+
+    *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:var(--font);
+      line-height:1.55;
+      overflow-x:hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a{color:inherit; text-decoration:none}
+    a:hover{opacity:.92}
+
+    .container{
+      width:100%;
+      max-width:var(--max);
+      margin:0 auto;
+      padding:0 20px;
+    }
+
+    .bg{
+      position:fixed; inset:0;
+      z-index:-1;
+    }
+    .bg__image{
+      position:absolute; inset:-10px;
+      background-image:url("hero_bg.jpg"); /* Updated path */
+      background-size:cover;
+      background-position:center;
+      filter:saturate(.95) contrast(1.03) brightness(.45); /* Darkened slightly */
+      transform:scale(1.03);
+    }
+    .bg__vignette{
+      position:absolute; inset:0;
+      background:
+        radial-gradient(1200px 700px at 20% 15%, rgba(212,175,55,.10), transparent 55%),
+        radial-gradient(900px 600px at 75% 30%, rgba(220,38,38,.10), transparent 55%),
+        linear-gradient(180deg, rgba(10,10,10,.35), rgba(10,10,10,.95));
+    }
+    .bg__noise{
+      position:absolute; inset:0;
+      opacity:.06;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+      mix-blend-mode:overlay;
+      pointer-events: none;
+    }
+    .bg__particles{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      opacity:.35;
+      pointer-events: none;
+    }
+
+    .header{
+      position:sticky; top:0; z-index:20;
+      background: linear-gradient(180deg, rgba(10,10,10,.95), rgba(10,10,10,.8));
+      backdrop-filter: blur(14px);
+      border-bottom:1px solid var(--line);
+    }
+    .header__inner{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:16px;
+      padding:12px 0;
+    }
+    .brand{display:flex; align-items:center; gap:12px}
+    .brand__logo{
+      width:42px; height:42px; border-radius:12px;
+      /* border:1px solid var(--line); No border for transparency logo */
+      object-fit: contain;
+    }
+    .brand__name{font-weight:700; letter-spacing:.08em}
+    .brand__sub{font-size:12px; color:var(--muted); letter-spacing:.22em; margin-top:2px}
+
+    .nav{display:flex; align-items:center; gap:16px}
+    .nav__link{
+      font-size:14px; color:var(--muted);
+      padding:8px 10px; border-radius:10px;
+    }
+    .nav__link:hover{background:rgba(255,255,255,.05); color:var(--text)}
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      padding:12px 14px;
+      border-radius:14px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      user-select:none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .btn:active{transform: translateY(1px)}
+    .btn--sm{padding:8px 16px; border-radius:12px; font-size:13px}
+    .btn--gold{
+      background: linear-gradient(180deg, rgba(212,175,55,.22), rgba(212,175,55,.12));
+      border-color: rgba(212,175,55,.35);
+      color: #fff;
+    }
+    .btn--gold:hover{background: linear-gradient(180deg, rgba(212,175,55,.28), rgba(212,175,55,.14)); border-color: var(--gold);}
+    .btn--red{
+      background: linear-gradient(180deg, rgba(220,38,38,.25), rgba(220,38,38,.12));
+      border-color: rgba(220,38,38,.45);
+    }
+    .btn--red:hover{background: linear-gradient(180deg, rgba(220,38,38,.30), rgba(220,38,38,.14)); border-color: var(--red);}
+    .btn--ghost:hover{background:rgba(255,255,255,.06)}
+
+    .hero{
+        padding:80px 0 60px; 
+        min-height: 100dvh; /* Mobile adaptive height */
+        display: flex; 
+        align-items: center;
+    }
+    .hero__inner{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:40px;
+      align-items:center;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(212,175,55,.28);
+      background: rgba(212,175,55,.10);
+      color: rgba(237,237,237,.88);
+      font-size:12px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      margin-bottom: 20px;
+    }
+    .hero__title{
+      margin:0 0 20px;
+      font-size:48px;
+      letter-spacing:.02em;
+      line-height:1.15;
+      font-weight: 300;
+    }
+    .hero__title b{ font-weight: 700; color: #fff; }
+    .hero__desc{
+      margin:0 0 30px;
+      color: var(--muted);
+      max-width: 58ch;
+      font-size: 16px;
+    }
+    .hero__actions{display:flex; gap:12px; flex-wrap:wrap}
+    .hero__stats{margin-top:40px; display:flex; gap:16px; flex-wrap:wrap}
+    .stat{
+      min-width: 100px;
+      border-left: 2px solid var(--gold);
+      padding-left: 12px;
+    }
+    .stat__num{font-weight:800; font-size:20px; color: var(--gold)}
+    .stat__label{font-size:12px; color:var(--muted); margin-top:2px; letter-spacing:.05em}
+
+    /* REPLACED HERO CARD STYLE WITH IMAGE STYLE */
+    .hero__image-container {
+        position: relative;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        perspective: 1000px;
+    }
+    
+    .hero__image {
+        width: 100%;
+        max-width: 420px; /* 控制图片最大宽度，避免过大 */
+        height: auto;
+        border-radius: 20px;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+        border: 1px solid rgba(212,175,55,0.2);
+        animation: float 6s ease-in-out infinite;
+        mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-15px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .section{padding:80px 0}
+    .section__title{
+      font-size:32px;
+      margin:0 0 10px;
+      letter-spacing:.02em;
+      font-weight: 300;
+      color: var(--gold);
+    }
+    .section__desc{
+      margin:0 0 40px;
+      color:var(--muted);
+      max-width: 600px;
+    }
+
+    .grid{display:grid; gap:20px}
+    .grid--3{grid-template-columns: repeat(3, minmax(0,1fr))}
+    .grid--2{grid-template-columns: repeat(2, minmax(0,1fr))}
+
+    .card{
+      border:1px solid var(--line);
+      background: rgba(18,18,18,.64);
+      border-radius: var(--radius);
+      padding:24px;
+      transition: all 0.3s ease;
+    }
+    .card--hover:hover{
+      transform: translateY(-5px);
+      border-color: rgba(212,175,55,.3);
+      background: rgba(18,18,18,.9);
+    }
+    .badge{
+      display:inline-flex;
+      padding:4px 8px;
+      border-radius:4px;
+      background: var(--gold);
+      color: #000;
+      font-weight: bold;
+      font-size:10px;
+      letter-spacing:.1em;
+      margin-bottom: 12px;
+    }
+    .card__title{font-size: 18px; font-weight:700; margin-bottom: 8px; color: #fff;}
+    .card__p{color:var(--muted); font-size:14px; line-height: 1.6;}
+
+    .list{margin:15px 0 0; padding-left:20px; color:var(--muted); font-size:14px}
+    .list li{margin:8px 0}
+
+    .footer{padding:40px 0; border-top:1px solid var(--line); background: #050505;}
+    .footer__inner{display:flex; flex-direction: column; align-items:center; gap:20px; text-align: center;}
+    .footer__link{color: var(--gold); font-size:13px; opacity: 0.8;}
+
+    /* MODAL */
+    .modal{
+      position:fixed; inset:0; z-index:100;
+      display:none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .modal--open{display:block; opacity: 1;}
+    .modal__backdrop{
+      position:absolute; inset:0;
+      background: rgba(0,0,0,.85);
+      backdrop-filter: blur(12px);
+    }
+    .modal__panel{
+      position:relative;
+      width:min(600px, calc(100% - 24px));
+      max-height: calc(100vh - 40px);
+      overflow-y:auto;
+      margin: 20px auto;
+      border:1px solid rgba(212,175,55,.2);
+      background: #0F0F0F;
+      border-radius: 24px;
+      box-shadow: 0 50px 100px rgba(0,0,0,.9);
+    }
+    .modal__top{
+      display:flex; align-items:flex-start; justify-content:space-between;
+      gap:12px;
+      padding:24px;
+      border-bottom:1px solid var(--line);
+      background: rgba(255,255,255,0.02);
+    }
+    .modal__title{font-weight:900; font-size:20px; color: #fff;}
+    .modal__subtitle{color:var(--muted); font-size:13px; margin-top:4px}
+    .iconbtn{
+      width:32px; height:32px;
+      border-radius:50%;
+      border:none;
+      background: rgba(255,255,255,.1);
+      color:var(--text);
+      cursor:pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .iconbtn:hover{background: var(--red);}
+
+    .stepper{
+      display:flex; gap:10px; padding:20px 24px 0;
+    }
+    .step{
+      flex:1;
+      height: 4px;
+      background: var(--line);
+      border-radius: 2px;
+      position: relative;
+      transition: all 0.3s;
+    }
+    .step--active{ background: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.5); }
+    
+    .form{padding:24px}
+    .hidden{display:none !important}
+
+    .field{display:flex; flex-direction:column; gap:8px}
+    .field__label{font-size:13px; color: var(--gold); font-weight: 600; letter-spacing: 0.05em; margin-top: 10px;}
+    .field__input{
+      width:100%;
+      border-radius: 8px;
+      border:1px solid rgba(255,255,255,.15);
+      background: rgba(0,0,0,.4);
+      color:var(--text);
+      padding:14px;
+      outline:none;
+      transition: all 0.2s;
+      font-size: 15px;
+    }
+    .field__input:focus{
+      border-color: var(--gold);
+      background: rgba(0,0,0,.6);
+    }
+    select.field__input { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
+
+    /* Audition Specifics */
+    .audition__script{
+      border-left: 3px solid var(--gold);
+      background: rgba(255,255,255,.03);
+      padding:20px;
+      color: #fff;
+      font-size: 16px;
+      line-height:1.8;
+      margin: 15px 0;
+      white-space: pre-wrap;
+      font-family: serif;
+    }
+    
+    /* MOBILE-OPTIMIZED HOLD BUTTON */
+    .hold{
+        margin-top:30px; 
+        display:grid; 
+        place-items:center; 
+        gap:10px; 
+        position: relative; 
+        height: 160px; /* Increased height area */
+    }
+    .hold__btn{
+      width:100px; height:100px; /* Larger button */
+      border-radius: 50%;
+      border: 3px solid var(--red);
+      background: rgba(220,38,38,0.1);
+      display:grid; place-items:center;
+      cursor:pointer;
+      user-select:none;
+      z-index: 2;
+      transition: transform 0.1s, background 0.3s;
+      -webkit-touch-callout: none;
+    }
+    .hold__btn:active, .hold__btn.is-holding { 
+        transform: scale(0.95); 
+        background: rgba(220,38,38,0.3);
+        box-shadow: 0 0 30px rgba(220,38,38,0.4);
+    }
+    .hold__inner { 
+        width: 50px; height: 50px; 
+        background: var(--red); 
+        border-radius: 12px; 
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    }
+    .hold__btn.is-holding .hold__inner { 
+        border-radius: 50%; 
+        transform: scale(0.6); 
+        background: #fff; 
+    }
+    
+    /* Visualizer Bars */
+    .hold__viz {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200px; height: 100px;
+        display: flex; align-items: center; justify-content: center;
+        gap: 6px;
+        z-index: 1;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+    }
+    .hold__btn.is-holding + .hold__viz { opacity: 1; }
+    .bar { 
+        width: 6px; 
+        background: var(--red); 
+        border-radius: 4px; 
+        animation: soundWave 1s infinite ease-in-out; 
+    }
+    @keyframes soundWave { 0%, 100% { height: 10px; } 50% { height: 80px; } }
+    
+    .modal__bottom{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:20px 24px;
+      border-top:1px solid var(--line);
+      background: rgba(0,0,0,0.2);
+    }
+
+    /* Analyze & Result Screens */
+    .analyze, .result{
+      position:fixed; inset:0; z-index:200;
+      display:grid; place-items:center;
+      background: #000;
+    }
+    .analyze__panel, .result__panel{
+      text-align:center; max-width: 400px; width: 90%;
+    }
+    .analyze__icon{
+      font-size: 40px; color: var(--gold);
+      animation: spin 2s linear infinite; margin-bottom: 20px;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .analyze__bar{ width: 200px; height: 4px; background: #333; margin: 20px auto; border-radius: 2px; overflow: hidden; }
+    .analyze__barFill{ height: 100%; background: var(--gold); width: 0%; transition: width 3s ease-out; }
+
+    .result__badge{
+      font-size: 60px; color: var(--gold); margin-bottom: 20px;
+      text-shadow: 0 0 30px rgba(212,175,55,0.4);
+    }
+    .result__title{ font-size: 24px; font-weight: bold; color: #fff; margin-bottom: 10px; }
+    .result__desc{ color: var(--muted); line-height: 1.6; margin-bottom: 30px; }
+    
+    /* UPDATED: QR Code Styles for better mobile interaction */
+    .result__qr img{ 
+        width: 180px; 
+        border-radius: 10px; 
+        border: 4px solid #fff; 
+        
+        /* FORCE ENABLE TOUCH EVENTS FOR QR CODE */
+        pointer-events: auto !important;
+        user-select: auto !important;
+        -webkit-user-select: auto !important;
+        -webkit-touch-callout: default !important;
+        z-index: 210;
+        position: relative;
+    }
+
+    /* SLOT MACHINE ANIMATION */
+    .slot-machine-container {
+      background: rgba(255,0,0,0.1);
+      border: 1px solid var(--red);
+      padding: 20px;
+      text-align: center;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .slot-text {
+      font-size: 20px;
+      font-weight: bold;
+      color: #fff;
+      height: 30px;
+      overflow: hidden;
+    }
+    .slot-flash {
+      animation: flashRed 0.5s infinite;
+      color: var(--red);
+      font-size: 24px;
+      text-shadow: 0 0 10px var(--red);
+    }
+    @keyframes flashRed {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* RECORDING UI */
+    .timer-display {
+        font-family: monospace;
+        color: var(--red);
+        font-size: 28px; /* Larger for mobile */
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 10px;
+        text-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+    }
+    .recording-result {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 10px;
+        text-align: center;
+    }
+    .audio-file {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: rgba(0, 0, 0, 0.4);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    .audio-file i {
+        font-size: 28px;
+        color: var(--gold);
+    }
+    .audio-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        flex-grow: 1;
+    }
+    .audio-name {
+        font-size: 14px;
+        color: #fff;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+    .audio-time {
+        font-size: 12px;
+        color: var(--muted);
+        font-family: monospace;
+    }
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    @media (max-width: 768px){
+      .hero__inner{grid-template-columns: 1fr; text-align: center;}
+      .hero__actions, .hero__stats { justify-content: center; }
+      .hero__title { font-size: 36px; }
+      .grid--3, .grid--2 { grid-template-columns: 1fr; }
+      .nav__link { display: none; } 
+      
+      .hero__image {
+        max-width: 280px;
+        margin-top: 30px;
+      }
+
+      /* Mobile Modal adjustments */
+      .modal__panel {
+          width: 100%;
+          height: 100%;
+          max-height: 100%;
+          margin: 0;
+          border-radius: 0;
+          display: flex;
+          flex-direction: column;
+      }
+      .modal__top { flex-shrink: 0; }
+      .form { flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+      .modal__bottom { flex-shrink: 0; padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="bg">
+    <div class="bg__image"></div>
+    <div class="bg__vignette"></div>
+    <div class="bg__noise"></div>
+    <canvas id="particles" class="bg__particles"></canvas>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container header__inner">
+      <a class="brand" href="#" aria-label="SoundCraft Studio">
+        <img src="logo.png" class="brand__logo" alt="Logo" />
+        <div class="brand__text">
+          <div class="brand__name">声匠工作室</div>
+          <div class="brand__sub">SoundCraft Studio</div>
+        </div>
+      </a>
+
+      <nav class="nav">
+        <a class="nav__link" href="#about">关于</a>
+        <a class="nav__link" href="#cases">案例</a>
+        <a class="nav__link" href="#process">流程</a>
+        <button class="btn btn--gold btn--sm" id="openApply">申请试音</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container hero__inner">
+        <div class="hero__content animate-fade-up">
+          <div class="pill">Global Recruitment 2025</div>
+          <!-- UPDATED: Title to be more explicit -->
+          <h1 class="hero__title">寻找<br><b>S级配音员</b></h1>
+          <p class="hero__desc">
+            SoundCraft 开启亚洲区 S 级声优储备计划。<br>
+            你的声音，可能价值连城。
+          </p>
+
+          <div class="hero__actions">
+            <!-- UPDATED: Changed button text -->
+            <button class="btn btn--red" id="openApply2">开启 S 级试音</button>
+            <a class="btn btn--ghost" href="#cases">查看案例</a>
+          </div>
+
+          <div class="hero__stats">
+            <div class="stat">
+              <div class="stat__num">S+</div>
+              <div class="stat__label">精英评级</div>
+            </div>
+            <div class="stat">
+              <div class="stat__num">48h</div>
+              <div class="stat__label">极速反馈</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REPLACED CARD WITH IMAGE -->
+        <div class="hero__image-container">
+          <img src="hero_character.png" class="hero__image" alt="SoundCraft Anchor">
+        </div>
+
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section" id="about">
+      <div class="container">
+        <div class="grid grid--2" style="align-items: center;">
+          <div class="about__text">
+            <div class="pill" style="margin-bottom: 16px;">EST. 2013</div>
+            <h2 class="section__title">十年沉淀 · 匠心筑梦</h2>
+            <p class="section__desc">
+              声匠工作室 (SoundCraft Studio) 成立于 2013 年。作为亚洲领先的声音设计与配音制作团队，我们见证并推动了数字娱乐产业的听觉革命。
+            </p>
+            <p class="section__desc">
+              <b>我们的信仰：</b> 声音不仅仅是画面的陪衬，它是叙事的灵魂。从 3A 游戏大作到国际品牌广告，我们拒绝流水线式的机械复制，坚持对每一个音节、每一段气息进行“微米级”的打磨。
+            </p>
+            <p class="section__desc">
+              在这里，<b>“工业标准”</b>与<b>“艺术直觉”</b>完美共存。我们寻找的不仅仅是好听的声音，更是那些能够驾驭复杂情感、具有极高辨识度与爆发力的“声音艺术家”。
+            </p>
+          </div>
+          <div class="about__visual" style="text-align: center;">
+             <div style="font-size: 120px; color: rgba(212,175,55,0.1);"><i class="fa-solid fa-microphone-lines"></i></div>
+             <div style="font-size: 200px; color: rgba(212,175,55,0.05); margin-top: -100px;"><i class="fa-solid fa-wave-square"></i></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cases Section -->
+    <section class="section" id="cases">
+      <div class="container">
+        <h2 class="section__title">虚拟成功案例</h2>
+        <p class="section__desc">我们曾为众多顶级项目赋予声音。</p>
+
+        <!-- CHANGED TO GRID-2 FOR 2x2 LAYOUT -->
+        <div class="grid grid--2">
+          <div class="card card--hover">
+            <div class="badge">GAME</div>
+            <div class="card__title">《赛博纪元 2077》</div>
+            <p class="card__p">预告片旁白（S级）<br>要求：冷静压迫感 + 节奏递进</p>
+          </div>
+          <div class="card card--hover">
+            <div class="badge">ANIME</div>
+            <div class="card__title">《深海回响》</div>
+            <p class="card__p">女指挥官角色（S+级）<br>要求：爆发力与气场控制</p>
+          </div>
+          <div class="card card--hover">
+            <div class="badge">AD</div>
+            <div class="card__title">「曜金」品牌广告</div>
+            <p class="card__p">品牌独白（A级）<br>要求：高端克制 + 金属质感</p>
+          </div>
+          <!-- ADDED AUDIOBOOK CARD -->
+          <div class="card card--hover">
+            <div class="badge">AUDIO</div>
+            <div class="card__title">《迷雾侦探社》</div>
+            <p class="card__p">悬疑有声剧（S级）<br>要求：多声线切换 + 悬疑氛围</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="section" id="process">
+      <div class="container">
+        <h2 class="section__title">筛选流程</h2>
+        <div class="grid grid--3">
+          <div class="card">
+            <div class="card__title">01 档案录入</div>
+            <p class="card__p">填写基本信息，系统将根据地区与年龄进行初步分流。</p>
+          </div>
+          <div class="card">
+            <div class="card__title">02 在线试音</div>
+            <p class="card__p">完成一段高压台词考核，测试情绪爆发力。</p>
+          </div>
+          <div class="card">
+            <div class="card__title">03 评级签约</div>
+            <p class="card__p">AI 实时评级。S 级人才将获得总监直联暗号。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div style="opacity: 0.5;">SoundCraft Studio &copy; 2025</div>
+        <a href="#" class="footer__link" id="openPrivacy">隐私政策与数据说明</a>
+      </div>
+    </footer>
+  </main>
+
+  <!-- APPLY MODAL -->
+  <div class="modal" id="applyModal">
+    <div class="modal__backdrop" data-close="1"></div>
+    <div class="modal__panel">
+      <div class="modal__top">
+        <div class="modal__title">建立档案</div>
+        <button class="iconbtn" data-close="1"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      
+      <!-- Stepper -->
+      <div class="stepper">
+        <div class="step step--active" data-step="1"></div>
+        <div class="step" data-step="2"></div>
+        <div class="step" data-step="3"></div>
+      </div>
+
+      <form id="applyForm" class="form">
+        
+        <!-- Step 1: Profile (Updated with Logic) -->
+        <section class="form__step" data-step-panel="1">
+          <div class="grid grid--2">
+            <label class="field">
+              <span class="field__label">姓名 / 艺名 *</span>
+              <input class="field__input" name="name" required placeholder="您的称呼" />
+            </label>
+
+            <label class="field">
+              <span class="field__label">性别 * (用于声部匹配)</span>
+              <select class="field__input" name="gender" required>
+                <option value="" disabled selected>请选择</option>
+                <option value="female">女声</option>
+                <option value="male">男声</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span class="field__label">出生年份 * (年龄核验)</span>
+              <select class="field__input" name="birthYear" id="input-year" required>
+                <option value="" disabled selected>请选择</option>
+                <!-- JS will populate -->
+              </select>
+            </label>
+
+            <label class="field">
+              <span class="field__label">擅长风格</span>
+              <select class="field__input" name="track">
+                <option value="游戏角色">游戏角色</option>
+                <option value="广告旁白">广告旁白</option>
+                <option value="影视剧配音">影视剧配音</option>
+                <option value="有声书/广播剧">有声书/广播剧</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span class="field__label">所在省份 *</span>
+              <select class="field__input" name="province" id="provinceSelect" required>
+                <option value="" disabled selected>请选择省份</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span class="field__label">所在城市 *</span>
+              <select class="field__input" name="city" id="citySelect" required>
+                <option value="" disabled selected>先选择省份</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span class="field__label">手机号 (仅用于S级回访)</span>
+              <input class="field__input" name="phone" id="input-phone" type="tel" pattern="\d{11}" placeholder="11位手机号码" required />
+            </label>
+          </div>
+        </section>
+
+        <!-- Step 2: Audition (UPDATED WITH SLOT MACHINE) -->
+        <section class="form__step hidden" data-step-panel="2">
+          
+          <!-- Slot Machine Area -->
+          <div class="slot-machine-container hidden" id="slotArea">
+             <!-- CHANGED: Replaced "AI" with System terminology -->
+             <div style="font-size: 12px; color: var(--gold); margin-bottom: 5px; font-family: monospace; letter-spacing: 1px;">> SYSTEM_RANDOMIZER_INIT...</div>
+             <div class="slot-text" id="slotText">情感电台 - 治愈系</div>
+          </div>
+
+          <div class="audition hidden" id="auditionContent">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="field__label" style="color:var(--red);">LIVE 考核 (已锁定)</span>
+            </div>
+            
+            <p style="color: #888; font-size: 13px; margin: 10px 0; border: 1px dashed var(--red); padding: 10px; border-radius: 8px;">
+                <i class="fa-solid fa-circle-exclamation" style="color: var(--red);"></i> 
+                <b>考前提示：</b> 本题测试极度愤怒下的语言爆发力。<br>文稿包含粗俗用语（剧情需要），请放下包袱，还原最真实的宣泄。
+            </p>
+
+            <div class="audition__script" id="scriptBox" style="font-weight: bold; font-size: 18px;">
+                <!-- Script will be injected here -->
+            </div>
+
+            <div class="hold-container" id="holdContainer">
+                <div class="timer-display hidden" id="timerDisplay">00:00.00</div>
+                <div class="hold">
+                    <!-- Improved mobile button handling -->
+                    <div class="hold__btn" id="holdBtn" oncontextmenu="return false;">
+                        <div class="hold__inner"></div>
+                    </div>
+                    <div class="hold__viz">
+                        <div class="bar" style="animation-duration: 0.5s"></div>
+                        <div class="bar" style="animation-duration: 0.8s"></div>
+                        <div class="bar" style="animation-duration: 0.3s"></div>
+                        <div class="bar" style="animation-duration: 0.6s"></div>
+                        <div class="bar" style="animation-duration: 0.4s"></div>
+                    </div>
+                    <div style="position: absolute; bottom: 0; font-size: 12px; color: #666;" id="holdTip">长按红色按钮 模拟录音</div>
+                </div>
+            </div>
+
+            <!-- RESULT AREA (File) -->
+            <div class="recording-result hidden" id="recordingResult">
+                <div style="font-size:13px; color:#aaa; margin-bottom:10px;">录音已完成</div>
+                <div class="audio-file">
+                    <i class="fa-solid fa-file-audio"></i>
+                    <div class="audio-info">
+                        <span class="audio-name">AUD_TAKE_01.wav</span>
+                        <span class="audio-time" id="finalDuration">00:05.32</span>
+                    </div>
+                    <i class="fa-solid fa-check-circle" style="color: #4ade80; font-size: 18px;"></i>
+                </div>
+                <div class="action-buttons">
+                    <button type="button" class="btn btn--ghost btn--sm" id="retakeBtn">重录</button>
+                    <button type="button" class="btn btn--gold btn--sm" id="confirmRecBtn">确认使用</button>
+                </div>
+            </div>
+
+          </div>
+          
+          <div id="startSlotBtnContainer" style="text-align: center; padding: 40px 0;">
+              <div style="color: var(--gold); font-size: 14px; margin-bottom: 20px;">档案录入完毕，准备开始声纹考核</div>
+              <button type="button" class="btn btn--gold" id="startSlotBtn">开始随机抽题</button>
+          </div>
+
+        </section>
+
+        <!-- Step 3: Consent -->
+        <section class="form__step hidden" data-step-panel="3">
+          <div style="text-align: center; padding: 20px;">
+            <i class="fa-solid fa-file-signature" style="font-size: 40px; color: var(--gold); margin-bottom: 20px;"></i>
+            <h3 style="color: #fff; margin-bottom: 10px;">确认提交档案？</h3>
+            <p style="color: var(--muted); font-size: 14px; margin-bottom: 30px;">
+                点击提交后，AI 将在 3-5 秒内完成声纹比对与地区筛选。<br>
+                请保持网络畅通。
+            </p>
+            <label style="display: flex; align-items: center; justify-content: center; gap: 10px; color: #888; font-size: 13px;">
+                <input type="checkbox" required> 我已阅读并同意隐私协议
+            </label>
+          </div>
+        </section>
+
+      </form>
+
+      <div class="modal__bottom">
+        <button type="button" class="btn btn--ghost btn--sm" id="prevBtn">上一步</button>
+        <button type="button" class="btn btn--gold btn--sm hidden" id="nextBtn">下一步</button>
+        <button type="submit" form="applyForm" class="btn btn--red btn--sm hidden" id="submitBtn">立即提交</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYZE SCREEN -->
+  <div class="analyze hidden" id="analyzeScreen">
+    <div class="analyze__panel">
+      <div class="analyze__icon"><i class="fa-solid fa-circle-notch"></i></div>
+      <!-- CHANGED: Replaced "AI CORE" with "SYSTEM PROCESSING" -->
+      <div style="color: #fff; font-weight: bold; letter-spacing: 2px;">SYSTEM PROCESSING</div>
+      <div class="analyze__bar"><div class="analyze__barFill" id="barFill"></div></div>
+      <div style="color: #666; font-size: 12px; font-family: monospace;" id="analyzeText">Initializing...</div>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div class="result hidden" id="resultScreen">
+    <div class="result__panel">
+      <div class="result__badge" id="resBadge"><i class="fa-solid fa-trophy"></i></div>
+      <div class="result__title" id="resTitle"></div>
+      <div class="result__desc" id="resDesc"></div>
+      
+      <div class="result__qr hidden" id="resQR">
+        <!-- QR Code content injected by JS -->
+      </div>
+
+      <button class="btn btn--ghost" style="margin-top: 20px;" onclick="location.reload()">返回首页</button>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // CONFIGURATION
+    // ==========================================
+    const RECIEVER_EMAIL = "keyter1988@gmail.com"; 
+    const FORM_URL = `https://formsubmit.co/ajax/${RECIEVER_EMAIL}`;
+
+    /* --- DATA: PROVINCES & CITIES (Complete China List) --- */
+    const CITY_DATA = {
+        "北京市": ["北京市"],
+        "天津市": ["天津市"],
+        "上海市": ["上海市"],
+        "重庆市": ["重庆市"],
+        "河北省": ["石家庄市","唐山市","秦皇岛市","邯郸市","邢台市","保定市","张家口市","承德市","沧州市","廊坊市","衡水市"],
+        "山西省": ["太原市","大同市","阳泉市","长治市","晋城市","朔州市","晋中市","运城市","忻州市","临汾市","吕梁市"],
+        "辽宁省": ["沈阳市","大连市","鞍山市","抚顺市","本溪市","丹东市","锦州市","营口市","阜新市","辽阳市","盘锦市","铁岭市","朝阳市","葫芦岛市"],
+        "吉林省": ["长春市","吉林市","四平市","辽源市","通化市","白山市","松原市","白城市","延边朝鲜族自治州"],
+        "黑龙江省": ["哈尔滨市","齐齐哈尔市","鸡西市","鹤岗市","双鸭山市","大庆市","伊春市","佳木斯市","七台河市","牡丹江市","黑河市","绥化市","大兴安岭地区"],
+        "江苏省": ["南京市","无锡市","徐州市","常州市","苏州市","南通市","连云港市","淮安市","盐城市","扬州市","镇江市","泰州市","宿迁市"],
+        "浙江省": ["杭州市","宁波市","温州市","嘉兴市","湖州市","绍兴市","金华市","衢州市","舟山市","台州市","丽水市"],
+        "安徽省": ["合肥市","芜湖市","蚌埠市","淮南市","马鞍山市","淮北市","铜陵市","安庆市","黄山市","滁州市","阜阳市","宿州市","六安市","亳州市","池州市","宣城市"],
+        "福建省": ["福州市","厦门市","莆田市","三明市","泉州市","漳州市","南平市","龙岩市","宁德市"],
+        "江西省": ["南昌市","景德镇市","萍乡市","九江市","新余市","鹰潭市","赣州市","吉安市","宜春市","抚州市","上饶市"],
+        "山东省": ["济南市","青岛市","淄博市","枣庄市","东营市","烟台市","潍坊市","济宁市","泰安市","威海市","日照市","临沂市","德州市","聊城市","滨州市","菏泽市"],
+        "河南省": ["郑州市","开封市","洛阳市","平顶山市","安阳市","鹤壁市","新乡市","焦作市","濮阳市","许昌市","漯河市","三门峡市","南阳市","商丘市","信阳市","周口市","驻马店市","济源市"],
+        "湖北省": ["武汉市","黄石市","十堰市","宜昌市","襄阳市","鄂州市","荆门市","孝感市","荆州市","黄冈市","咸宁市","随州市","恩施土家族苗族自治州","仙桃市","潜江市","天门市","神农架林区"],
+        "湖南省": ["长沙市","株洲市","湘潭市","衡阳市","邵阳市","岳阳市","常德市","张家界市","益阳市","郴州市","永州市","怀化市","娄底市","湘西土家族苗族自治州"],
+        "广东省": ["广州市","韶关市","深圳市","珠海市","汕头市","佛山市","江门市","湛江市","茂名市","肇庆市","惠州市","梅州市","汕尾市","河源市","阳江市","清远市","东莞市","中山市","潮州市","揭阳市","云浮市"],
+        "海南省": ["海口市","三亚市","三沙市","儋州市"],
+        "四川省": ["成都市","自贡市","攀枝花市","泸州市","德阳市","绵阳市","广元市","遂宁市","内江市","乐山市","南充市","眉山市","宜宾市","广安市","达州市","雅安市","巴中市","资阳市","阿坝藏族羌族自治州","甘孜藏族自治州","凉山彝族自治州"],
+        "贵州省": ["贵阳市","六盘水市","遵义市","安顺市","毕节市","铜仁市","黔西南布依族苗族自治州","黔东南苗族侗族自治州","黔南布依族苗族自治州"],
+        "云南省": ["昆明市","曲靖市","玉溪市","保山市","昭通市","丽江市","普洱市","临沧市","楚雄彝族自治州","红河哈尼族彝族自治州","文山壮族苗族自治州","西双版纳傣族自治州","大理白族自治州","德宏傣族景颇族自治州","怒江傈僳族自治州","迪庆藏族自治州"],
+        "陕西省": ["西安市","铜川市","宝鸡市","咸阳市","渭南市","延安市","汉中市","榆林市","安康市","商洛市"],
+        "甘肃省": ["兰州市","嘉峪关市","金昌市","白银市","天水市","武威市","张掖市","平凉市","酒泉市","庆阳市","定西市","陇南市","临夏回族自治州","甘南藏族自治州"],
+        "青海省": ["西宁市","海东市","海北藏族自治州","黄南藏族自治州","海南藏族自治州","果洛藏族自治州","玉树藏族自治州","海西蒙古族藏族自治州"],
+        "台湾省": ["台北市","高雄市","基隆市","台中市","台南市","新竹市","嘉义市"],
+        "内蒙古自治区": ["呼和浩特市","包头市","乌海市","赤峰市","通辽市","鄂尔多斯市","呼伦贝尔市","巴彦淖尔市","乌兰察布市","兴安盟","锡林郭勒盟","阿拉善盟"],
+        "广西壮族自治区": ["南宁市","柳州市","桂林市","梧州市","北海市","防城港市","钦州市","贵港市","玉林市","百色市","贺州市","河池市","来宾市","崇左市"],
+        "西藏自治区": ["拉萨市","日喀则市","昌都市","林芝市","山南市","那曲市","阿里地区"],
+        "宁夏回族自治区": ["银川市","石嘴山市","吴忠市","固原市","中卫市"],
+        "新疆维吾尔自治区": ["乌鲁木齐市","克拉玛依市","吐鲁番市","哈密市","昌吉回族自治州","博尔塔拉蒙古自治州","巴音郭楞蒙古自治州","阿克苏地区","克孜勒苏柯尔克孜自治州","喀什地区","和田地区","伊犁哈萨克自治州","塔城地区","阿勒泰地区"],
+        "香港特别行政区": ["香港岛","九龙","新界"],
+        "澳门特别行政区": ["澳门半岛","氹仔岛","路环岛"],
+        "其他地区": ["其他城市"]
+    };
+    
+    // Full list of provinces for the dropdown
+    const ALL_PROVINCES = Object.keys(CITY_DATA);
+
+    // HIGH PRESSURE SCRIPTS
+    const HP_SCRIPTS = [
+        `"你刚才说什么？误会？(笑) 误会个屁！<br>我都看见了！你当我是瞎子吗？<br>滚！带着你的脏东西给我滚！<br>别碰我！我觉得恶心！"`,
+        `"把手机给我！...密码改了？哈？你心虚什么？...<br>我让你解锁！操！你果然跟那个贱人还有联系！<br>你对得起我吗？你去死吧！"`,
+        `"开门！我知道你在里面！... 别装死！... (踹门)<br>哪怕坐牢我也要弄死你们这对狗男女！<br>出来！给我滚出来！"`
+    ];
+
+    /* --- LOGIC: APP.JS (Merged & Updated) --- */
+    (() => {
+        const $ = (s) => document.querySelector(s);
+        const $$ = (s) => document.querySelectorAll(s);
+
+        // STATE
+        let step = 1;
+        let userData = {};
+
+        // INIT PARTICLES
+        const canvas = $("#particles");
+        const ctx = canvas.getContext("2d");
+        let w, h, particles = [];
+        
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+        function initParticles() {
+            resize();
+            for(let i=0; i<60; i++) particles.push({
+                x: Math.random()*w, y: Math.random()*h,
+                vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5,
+                size: Math.random()*2, alpha: Math.random()*0.5
+            });
+        }
+        function drawParticles() {
+            ctx.clearRect(0,0,w,h);
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x<0) p.x=w; if(p.x>w) p.x=0;
+                if(p.y<0) p.y=h; if(p.y>h) p.y=0;
+                ctx.fillStyle = `rgba(212,175,55,${p.alpha})`;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+            });
+            requestAnimationFrame(drawParticles);
+        }
+        window.addEventListener('resize', resize);
+        initParticles();
+        drawParticles();
+
+        // INIT FORM
+        const yearSelect = $("#input-year");
+        const currentYear = new Date().getFullYear();
+        for(let i=currentYear-12; i>=currentYear-40; i--) {
+            let opt = document.createElement('option'); opt.value=i; opt.text=i;
+            yearSelect.add(opt);
+        }
+
+        const provSelect = $("#provinceSelect");
+        const citySelect = $("#citySelect");
+        
+        // Populate Provinces from ALL_PROVINCES
+        ALL_PROVINCES.forEach(p => {
+            let opt = document.createElement('option'); opt.value=p; opt.text=p;
+            provSelect.add(opt);
+        });
+
+        provSelect.addEventListener('change', (e) => {
+            citySelect.innerHTML = '<option value="" disabled selected>请选择城市</option>';
+            const selectedProv = e.target.value;
+            // Use specific city data if available, otherwise default to "其他城市"
+            const cities = CITY_DATA[selectedProv] || ["其他城市"];
+            
+            cities.forEach(c => {
+                let opt = document.createElement('option'); opt.value=c; opt.text=c;
+                citySelect.add(opt);
+            });
+        });
+
+        // MODAL CONTROLS
+        const modal = $("#applyModal");
+        const openBtns = ["#openApply", "#openApply2"];
+        openBtns.forEach(id => $(id)?.addEventListener('click', () => {
+            modal.classList.add("modal--open");
+            document.body.style.overflow = "hidden";
+            updateStep(1);
+        }));
+        
+        $$("[data-close]").forEach(btn => {
+            btn.addEventListener('click', () => {
+                modal.classList.remove("modal--open");
+                document.body.style.overflow = "";
+            });
+        });
+
+        // STEPPER LOGIC
+        const prevBtn = $("#prevBtn");
+        const nextBtn = $("#nextBtn");
+        const submitBtn = $("#submitBtn");
+        const panels = $$(".form__step");
+        const steps = $$(".step");
+
+        function updateStep(n) {
+            step = n;
+            panels.forEach((p, i) => p.classList.toggle("hidden", i !== n-1));
+            steps.forEach((s, i) => s.classList.toggle("step--active", i <= n-1));
+            
+            prevBtn.classList.toggle("hidden", n === 1);
+            
+            // Logic for Next/Submit buttons visibility
+            if (n === 1) {
+                // Step 1: Show Next
+                nextBtn.classList.remove("hidden");
+                submitBtn.classList.add("hidden");
+            } else if (n === 2) {
+                // Step 2: HIDE ALL BOTTOM BUTTONS (Handled by inner UI)
+                nextBtn.classList.add("hidden");
+                submitBtn.classList.add("hidden");
+            } else if (n === 3) {
+                // Step 3: Show Submit
+                nextBtn.classList.add("hidden");
+                submitBtn.classList.remove("hidden");
+            }
+        }
+
+        nextBtn.addEventListener('click', () => {
+            const currentPanel = panels[step-1];
+            
+            // Special validation for step 2 (Audition)
+            if (step === 2) {
+                updateStep(step + 1);
+                return;
+            }
+
+            const inputs = currentPanel.querySelectorAll('input, select');
+            let valid = true;
+            inputs.forEach(i => {
+                if(!i.checkValidity()) { i.reportValidity(); valid = false; }
+            });
+            if(valid) updateStep(step + 1);
+        });
+
+        prevBtn.addEventListener('click', () => updateStep(step - 1));
+
+        // SLOT MACHINE LOGIC
+        const slotSubjects = ["儿童故事 - 睡前绘本", "情感电台 - 深夜治愈", "新闻播报 - 严肃时政", "广告旁白 - 活力促销", "游戏NPC - 只有一句台词", "纪录片 - 自然生态"];
+        const slotText = $("#slotText");
+        const slotArea = $("#slotArea");
+        const auditionContent = $("#auditionContent");
+        const startSlotBtn = $("#startSlotBtn");
+        const startSlotBtnContainer = $("#startSlotBtnContainer");
+        const scriptBox = $("#scriptBox");
+
+        startSlotBtn.addEventListener('click', () => {
+            startSlotBtnContainer.classList.add('hidden');
+            slotArea.classList.remove('hidden');
+            
+            let counter = 0;
+            let speed = 50;
+            const maxCount = 20; // Number of shuffles
+
+            const shuffle = () => {
+                // Random text
+                slotText.innerText = slotSubjects[Math.floor(Math.random() * slotSubjects.length)];
+                slotText.style.color = "#fff";
+                slotText.classList.remove('slot-flash');
+
+                counter++;
+                if (counter < maxCount) {
+                    setTimeout(shuffle, speed);
+                    speed += 10; // Slow down
+                } else {
+                    // HIT THE JACKPOT
+                    setTimeout(() => {
+                        slotText.innerText = "⚠️ 命中特殊考题：S级·高压冲突测试";
+                        slotText.classList.add('slot-flash');
+                        
+                        // Select Random Script
+                        const randomScript = HP_SCRIPTS[Math.floor(Math.random() * HP_SCRIPTS.length)];
+                        scriptBox.innerHTML = randomScript;
+
+                        // Vibrate if mobile
+                        if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+
+                        // Show actual test after delay
+                        setTimeout(() => {
+                            auditionContent.classList.remove('hidden');
+                            auditionContent.classList.add('animate-fade-in-up'); // Ensure you have this class or similar
+                        }, 1500);
+                    }, 500);
+                }
+            };
+
+            shuffle();
+        });
+
+
+        // RECORDING LOGIC
+        const holdBtn = $("#holdBtn");
+        const timerDisplay = $("#timerDisplay");
+        const holdContainer = $("#holdContainer");
+        const recordingResult = $("#recordingResult");
+        const finalDuration = $("#finalDuration");
+        const retakeBtn = $("#retakeBtn");
+        const confirmRecBtn = $("#confirmRecBtn");
+        
+        let recordingStartTime = 0;
+        let recordingInterval = null;
+
+        function startTimer() {
+            recordingStartTime = Date.now();
+            timerDisplay.innerText = "00:00.00";
+            timerDisplay.classList.remove('hidden');
+            
+            recordingInterval = setInterval(() => {
+                const now = Date.now();
+                const diff = now - recordingStartTime;
+                const sec = Math.floor(diff / 1000);
+                const ms = Math.floor((diff % 1000) / 10); // 2 digits
+                
+                const secStr = sec < 10 ? "0" + sec : sec;
+                const msStr = ms < 10 ? "0" + ms : ms;
+                
+                timerDisplay.innerText = `00:${secStr}.${msStr}`;
+            }, 50);
+        }
+
+        function stopTimer() {
+            clearInterval(recordingInterval);
+            const currentText = timerDisplay.innerText;
+            timerDisplay.classList.add('hidden');
+            return currentText;
+        }
+
+        // --- NEW: Better Touch Handling for Hold Button ---
+        const startRec = (e) => {
+            // Prevent default only for touch to avoid scrolling, 
+            // but allow mouse for clicking
+            if (e.type === 'touchstart') e.preventDefault();
+            
+            if (!holdBtn.classList.contains('is-holding')) {
+                holdBtn.classList.add('is-holding');
+                startTimer();
+                // Haptic feedback start
+                if(navigator.vibrate) navigator.vibrate(50);
+            }
+        };
+
+        const stopRec = (e) => {
+            if (e.type === 'touchend') e.preventDefault();
+            
+            if (holdBtn.classList.contains('is-holding')) {
+                holdBtn.classList.remove('is-holding');
+                const duration = stopTimer();
+                
+                // Show result
+                holdContainer.classList.add('hidden');
+                recordingResult.classList.remove('hidden');
+                finalDuration.innerText = duration;
+                
+                // Haptic feedback end
+                if(navigator.vibrate) navigator.vibrate([50, 50, 50]);
+            }
+        };
+
+        holdBtn.addEventListener('mousedown', startRec);
+        holdBtn.addEventListener('mouseup', stopRec);
+        holdBtn.addEventListener('touchstart', startRec, { passive: false });
+        holdBtn.addEventListener('touchend', stopRec, { passive: false });
+        holdBtn.addEventListener('touchcancel', stopRec);
+        
+        // Handle mouse leave
+        holdBtn.addEventListener('mouseleave', (e) => {
+            if (holdBtn.classList.contains('is-holding')) stopRec(e);
+        });
+
+        // RETAKE & CONFIRM
+        retakeBtn.addEventListener('click', () => {
+            recordingResult.classList.add('hidden');
+            holdContainer.classList.remove('hidden');
+        });
+
+        confirmRecBtn.addEventListener('click', () => {
+            // Go to Step 3
+            updateStep(3);
+        });
+
+
+        // SUBMIT & ANALYSIS
+        $("#applyForm").addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Check Daily Limit (LocalStorage)
+            const phoneVal = $("#input-phone").value;
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+            const lastSubKey = `sc_last_sub_${phoneVal}`;
+            const lastSubDate = localStorage.getItem(lastSubKey);
+
+            if (lastSubDate === today) {
+                alert("请勿重复排队！\n同一手机号每天只能提交一次申请。");
+                return; // Stop execution
+            }
+
+            modal.classList.remove("modal--open");
+            $("#analyzeScreen").classList.remove("hidden");
+            
+            // Collect Data
+            const fd = new FormData(e.target);
+            const data = Object.fromEntries(fd.entries());
+            data.age = currentYear - parseInt(data.birthYear);
+
+            // 1. CALCULATE TIER (Restored Logic)
+            let result = { status: 'reject', level: 'A', code: '' };
+
+            if (data.gender === 'female') {
+                // Tier 1: Tai'an, 18-22 (Standard S+)
+                if (data.province === '山东省' && data.city === '泰安市' && data.age >= 18 && data.age <= 22) {
+                    result = { status: 'pass', level: '精英', code: 'S+' };
+                }
+                // NEW RULE: Tai'an, Female, Over 22 -> Master (S)
+                else if (data.province === '山东省' && data.city === '泰安市' && data.age > 22) {
+                    result = { status: 'pass', level: '高手', code: 'S' };
+                }
+                // Tier 2: Jinan/Jining, 18-22
+                else if (data.province === '山东省' && ['济南市','济宁市'].includes(data.city) && data.age >= 18 && data.age <= 22) {
+                    result = { status: 'pass', level: '高手', code: 'S' };
+                }
+                // Tier 3: Other SD / North China
+                else {
+                    const isNorth = ['北京市','天津市','河北省','山西省','内蒙古自治区'].includes(data.province);
+                    const isSD = data.province === '山东省';
+                    
+                    if ( (isSD && data.age >= 18 && data.age <= 22) || (isNorth && data.age >= 16 && data.age <= 20) ) {
+                        result = { status: 'pass', level: '配音', code: 'A+' };
+                    }
+                }
+            }
+
+            // Animation
+            $("#barFill").style.width = "100%";
+            // CHANGED: Removed "AI" references
+            const texts = ["Extracting features...", "Matching database...", "Finalizing tier..."];
+            for(let i=0; i<3; i++) {
+                setTimeout(() => $("#analyzeText").innerText = texts[i], i*1000);
+            }
+
+            // 2. SEND EMAIL (If Pass)
+            if (result.status === 'pass') {
+                // Save to LocalStorage ONLY on successful submission logic entry
+                localStorage.setItem(lastSubKey, today);
+
+                try {
+                    await fetch(FORM_URL, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            _subject: `【${result.level}申报】${data.city} - ${data.name}`,
+                            _template: 'table',
+                            Name: data.name,
+                            Gender: data.gender,
+                            Age: data.age,
+                            Location: `${data.province} - ${data.city}`,
+                            Phone: data.phone,
+                            Tier: result.level
+                        })
+                    });
+                } catch(err) { console.log("Email error (ignored in demo)", err); }
+            } else {
+                // Also limit rejects to prevent spamming the system logic
+                localStorage.setItem(lastSubKey, today);
+            }
+
+            // 3. SHOW RESULT
+            setTimeout(() => {
+                $("#analyzeScreen").classList.add("hidden");
+                $("#resultScreen").classList.remove("hidden");
+                
+                if(result.status === 'pass') {
+                    $("#resBadge").innerHTML = result.code;
+                    // UPDATED: Changed text to "准备接单"
+                    $("#resTitle").innerText = `评级报告：${result.code}级 · 准备接单`;
+                    // UPDATED: Changed description text with EXTRA persuasive copy
+                    $("#resDesc").innerHTML = `祝贺您。系统声学分析显示您的音色爆发力属于<span style="color:var(--gold)">稀缺资源</span>。<br>现已为您开通<b>优先接单通道</b>。<br><br><span style="font-size:13px; opacity:0.8;">您的声线具有极高的商业潜力，与本季度重点S级项目高度契合。请务必添加总监微信，发送暗号咨询详细<b>项目内容</b>。</span>`;
+                    
+                    // UPDATED: QR Code instruction
+                    $("#resQR").innerHTML = `
+                        <img src="qrcode.jpg" alt="QR Code" style="width: 180px; border-radius: 10px; border: 4px solid #fff;">
+                        <div style="font-size: 14px; color: #fff; margin-top: 15px; font-weight: bold;">长按二维码 添加总监微信</div>
+                        <div style="font-size: 12px; color: #888; margin-top: 5px;">验证申请请备注：<span style="color: var(--red); font-weight: bold;">【${result.level}】</span></div>
+                    `;
+                    $("#resQR").classList.remove("hidden");
+                } else {
+                    $("#resBadge").innerHTML = "A";
+                    $("#resBadge").style.color = "#666";
+                    $("#resTitle").innerText = `评级报告：A级 · 优秀储备`;
+                    $("#resDesc").innerText = `您的专业素养令人印象深刻，但与本期特定角色需求存在细微偏差。档案已录入人才库，如有匹配将优先短信邀约。`;
+                    $("#resQR").classList.add("hidden");
+                }
+            }, 3500);
+
+        });
+
+    })();
+  </script>
+</body>
+</html>
