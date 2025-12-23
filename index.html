@@ -754,7 +754,7 @@
         <div class="step" data-step="3"></div>
       </div>
 
-      <form id="applyForm" class="form">
+      <form id="applyForm" class="form" enctype="multipart/form-data">
         
         <!-- Step 1: Profile (Updated with Logic) -->
         <section class="form__step" data-step-panel="1">
@@ -1154,7 +1154,7 @@
                 return true;
             } catch (err) {
                 console.error("Mic Error:", err);
-                alert("无法获取麦克风权限。请在浏览器设置中允许录音，然后刷新页面重试。");
+                alert("无法获取麦克风权限。\n请确保在浏览器设置中允许录音，或尝试使用Chrome/Safari打开。");
                 return false;
             }
         }
@@ -1391,10 +1391,10 @@
 
             // Animation
             $("#barFill").style.width = "100%";
-            // CHANGED: Removed "AI" references
-            const texts = ["Extracting features...", "Matching database...", "Finalizing tier..."];
-            for(let i=0; i<3; i++) {
-                setTimeout(() => $("#analyzeText").innerText = texts[i], i*1000);
+            // CHANGED: Removed "AI" references, added UPLOADING step
+            const texts = ["Extracting features...", "Matching database...", "Uploading Audio Payload...", "Finalizing tier..."];
+            for(let i=0; i<4; i++) {
+                setTimeout(() => $("#analyzeText").innerText = texts[i], i*800);
             }
 
             // 2. SEND EMAIL (If Pass)
@@ -1407,7 +1407,7 @@
                     const submissionData = new FormData();
                     submissionData.append('_subject', `【${result.level}申报】${data.city} - ${data.name}`);
                     submissionData.append('_template', 'table');
-                    submissionData.append('_captcha', 'false'); // Optional: disable captcha
+                    submissionData.append('_captcha', 'false'); // Disable captcha
                     
                     // Add fields
                     submissionData.append('Name', data.name);
@@ -1417,19 +1417,40 @@
                     submissionData.append('Phone', data.phone);
                     submissionData.append('Tier', result.level);
                     
-                    // ATTACH FILE IF EXISTS
+                    // ATTACH FILE IF EXISTS (Robust Extension Handling)
                     if (audioBlob) {
-                        const fileExt = audioBlob.type.includes('webm') ? 'webm' : 'wav';
-                        const fileName = `VO_${data.name}_${Date.now()}.${fileExt}`;
+                        const mime = audioBlob.type;
+                        let ext = 'webm';
+                        if(mime.includes('mp4')) ext = 'mp4';
+                        else if(mime.includes('wav')) ext = 'wav';
+                        else if(mime.includes('ogg')) ext = 'ogg';
+                        else if(mime.includes('mpeg')) ext = 'mp3';
+                        
+                        const fileName = `VO_${data.name}_${Date.now()}.${ext}`;
+                        // "attachment" is the key FormSubmit looks for
                         submissionData.append('attachment', audioBlob, fileName);
                     }
 
                     // Send using fetch
-                    await fetch(FORM_URL, {
+                    const response = await fetch(FORM_URL, {
                         method: 'POST',
+                        headers: {
+                            'Accept': 'application/json' // CRITICAL for AJAX to work reliably
+                        },
                         body: submissionData // FormData sets correct Content-Type with boundary
                     });
-                } catch(err) { console.log("Email error (ignored in demo)", err); }
+                    
+                    if (!response.ok) {
+                         console.error("FormSubmit Error:", await response.text());
+                         alert("⚠️ 系统提示：\n表单提交连接不稳定，请检查您的网络。\n如果这是首次提交，请检查您的邮箱（包括垃圾箱）并点击【Activate】激活链接。");
+                    } else {
+                        console.log("FormSubmit Success:", await response.json());
+                    }
+
+                } catch(err) { 
+                    console.log("Email error:", err); 
+                    alert("⚠️ 提交失败：\n无法连接到服务器。请稍后再试。\n(Network Error)");
+                }
             } else {
                 localStorage.setItem(lastSubKey, today);
             }
