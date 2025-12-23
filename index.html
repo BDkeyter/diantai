@@ -523,7 +523,10 @@
         border-radius: 8px;
         margin-bottom: 20px;
         border: 1px solid rgba(255,255,255,0.1);
+        cursor: pointer;
+        transition: background 0.2s;
     }
+    .audio-file:hover { background: rgba(0,0,0,0.6); }
     .audio-file i {
         font-size: 28px;
         color: var(--gold);
@@ -642,7 +645,7 @@
 
         <!-- REPLACED CARD WITH IMAGE -->
         <div class="hero__image-container">
-          <img src="hero_character.png" class="hero__image" alt="SoundCraft Anchor">
+          <img src="hero_character.jpg" class="hero__image" alt="SoundCraft Anchor">
         </div>
 
       </div>
@@ -847,21 +850,22 @@
                         <div class="bar" style="animation-duration: 0.6s"></div>
                         <div class="bar" style="animation-duration: 0.4s"></div>
                     </div>
-                    <div style="position: absolute; bottom: 0; font-size: 12px; color: #666;" id="holdTip">长按红色按钮 模拟录音</div>
+                    <div style="position: absolute; bottom: 0; font-size: 12px; color: #666;" id="holdTip">长按红色按钮 进行录音</div>
                 </div>
             </div>
 
             <!-- RESULT AREA (File) -->
             <div class="recording-result hidden" id="recordingResult">
                 <div style="font-size:13px; color:#aaa; margin-bottom:10px;">录音已完成</div>
-                <div class="audio-file">
-                    <i class="fa-solid fa-file-audio"></i>
+                <div class="audio-file" id="previewAudioBtn">
+                    <i class="fa-solid fa-circle-play"></i>
                     <div class="audio-info">
-                        <span class="audio-name">AUD_TAKE_01.wav</span>
+                        <span class="audio-name" id="audioFileName">AUD_TAKE.wav</span>
                         <span class="audio-time" id="finalDuration">00:05.32</span>
                     </div>
                     <i class="fa-solid fa-check-circle" style="color: #4ade80; font-size: 18px;"></i>
                 </div>
+                <div style="font-size:12px; color:#666; margin-bottom:10px;">(点击播放试听)</div>
                 <div class="action-buttons">
                     <button type="button" class="btn btn--ghost btn--sm" id="retakeBtn">重录</button>
                     <button type="button" class="btn btn--gold btn--sm" id="confirmRecBtn">确认使用</button>
@@ -872,7 +876,7 @@
           
           <div id="startSlotBtnContainer" style="text-align: center; padding: 40px 0;">
               <div style="color: var(--gold); font-size: 14px; margin-bottom: 20px;">档案录入完毕，准备开始声纹考核</div>
-              <button type="button" class="btn btn--gold" id="startSlotBtn">开始随机抽题</button>
+              <button type="button" class="btn btn--gold" id="startSlotBtn">允许麦克风并抽题</button>
           </div>
 
         </section>
@@ -933,7 +937,8 @@
     // CONFIGURATION
     // ==========================================
     const RECIEVER_EMAIL = "keyter1988@gmail.com"; 
-    const FORM_URL = `https://formsubmit.co/ajax/${RECIEVER_EMAIL}`;
+    // Uses FormSubmit.co. Standard POST supports FormData with files.
+    const FORM_URL = `https://formsubmit.co/${RECIEVER_EMAIL}`;
 
     /* --- DATA: PROVINCES & CITIES (Complete China List) --- */
     const CITY_DATA = {
@@ -992,6 +997,13 @@
         // STATE
         let step = 1;
         let userData = {};
+        
+        // RECORDER STATE
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let audioBlob = null;
+        let audioUrl = null;
+        let audioPlayer = new Audio();
 
         // INIT PARTICLES
         const canvas = $("#particles");
@@ -1116,6 +1128,37 @@
 
         prevBtn.addEventListener('click', () => updateStep(step - 1));
 
+        // RECORDER INITIALIZATION
+        async function initRecorder() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    // Create Blob
+                    const blobType = mediaRecorder.mimeType || 'audio/webm'; // Chrome uses webm, Safari uses mp4/wav
+                    audioBlob = new Blob(audioChunks, { type: blobType });
+                    audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    // Update UI info
+                    const sizeKB = (audioBlob.size / 1024).toFixed(1);
+                    $("#audioFileName").innerText = `REC_${Date.now().toString().slice(-6)}.wav (${sizeKB}KB)`;
+                    
+                    // Setup Player
+                    audioPlayer.src = audioUrl;
+                };
+                return true;
+            } catch (err) {
+                console.error("Mic Error:", err);
+                alert("无法获取麦克风权限。请在浏览器设置中允许录音，然后刷新页面重试。");
+                return false;
+            }
+        }
+
         // SLOT MACHINE LOGIC
         const slotSubjects = ["儿童故事 - 睡前绘本", "情感电台 - 深夜治愈", "新闻播报 - 严肃时政", "广告旁白 - 活力促销", "游戏NPC - 只有一句台词", "纪录片 - 自然生态"];
         const slotText = $("#slotText");
@@ -1125,7 +1168,11 @@
         const startSlotBtnContainer = $("#startSlotBtnContainer");
         const scriptBox = $("#scriptBox");
 
-        startSlotBtn.addEventListener('click', () => {
+        startSlotBtn.addEventListener('click', async () => {
+            // REQUEST MIC PERMISSION FIRST
+            const hasMic = await initRecorder();
+            if (!hasMic) return;
+
             startSlotBtnContainer.classList.add('hidden');
             slotArea.classList.remove('hidden');
             
@@ -1177,6 +1224,7 @@
         const finalDuration = $("#finalDuration");
         const retakeBtn = $("#retakeBtn");
         const confirmRecBtn = $("#confirmRecBtn");
+        const previewAudioBtn = $("#previewAudioBtn");
         
         let recordingStartTime = 0;
         let recordingInterval = null;
@@ -1206,14 +1254,16 @@
             return currentText;
         }
 
-        // --- NEW: Better Touch Handling for Hold Button ---
         const startRec = (e) => {
-            // Prevent default only for touch to avoid scrolling, 
-            // but allow mouse for clicking
             if (e.type === 'touchstart') e.preventDefault();
             
-            if (!holdBtn.classList.contains('is-holding')) {
+            if (!holdBtn.classList.contains('is-holding') && mediaRecorder && mediaRecorder.state === "inactive") {
                 holdBtn.classList.add('is-holding');
+                
+                // START REAL RECORDING
+                audioChunks = [];
+                mediaRecorder.start();
+                
                 startTimer();
                 // Haptic feedback start
                 if(navigator.vibrate) navigator.vibrate(50);
@@ -1227,6 +1277,11 @@
                 holdBtn.classList.remove('is-holding');
                 const duration = stopTimer();
                 
+                // STOP REAL RECORDING
+                if(mediaRecorder && mediaRecorder.state === "recording") {
+                    mediaRecorder.stop();
+                }
+
                 // Show result
                 holdContainer.classList.add('hidden');
                 recordingResult.classList.remove('hidden');
@@ -1243,18 +1298,41 @@
         holdBtn.addEventListener('touchend', stopRec, { passive: false });
         holdBtn.addEventListener('touchcancel', stopRec);
         
-        // Handle mouse leave
         holdBtn.addEventListener('mouseleave', (e) => {
             if (holdBtn.classList.contains('is-holding')) stopRec(e);
         });
 
+        // PREVIEW AUDIO
+        previewAudioBtn.addEventListener('click', () => {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                previewAudioBtn.querySelector('.fa-circle-play').classList.replace('fa-circle-play', 'fa-circle-pause');
+            } else {
+                audioPlayer.pause();
+                previewAudioBtn.querySelector('.fa-circle-pause').classList.replace('fa-circle-pause', 'fa-circle-play');
+            }
+        });
+        audioPlayer.onended = () => {
+            previewAudioBtn.querySelector('.fa-circle-pause').classList.replace('fa-circle-pause', 'fa-circle-play');
+        };
+
         // RETAKE & CONFIRM
         retakeBtn.addEventListener('click', () => {
+            audioBlob = null;
+            audioChunks = [];
             recordingResult.classList.add('hidden');
             holdContainer.classList.remove('hidden');
+            // Reset player icon
+            const icon = previewAudioBtn.querySelector('.fa-circle-pause');
+            if(icon) icon.classList.replace('fa-circle-pause', 'fa-circle-play');
+            audioPlayer.pause();
         });
 
         confirmRecBtn.addEventListener('click', () => {
+            if (!audioBlob) {
+                alert("录音数据为空，请重试。");
+                return;
+            }
             // Go to Step 3
             updateStep(3);
         });
@@ -1279,8 +1357,9 @@
             $("#analyzeScreen").classList.remove("hidden");
             
             // Collect Data
-            const fd = new FormData(e.target);
-            const data = Object.fromEntries(fd.entries());
+            // NOTE: We don't use FormData(e.target) directly for fetch body because we need to append file
+            const formDataObj = new FormData(e.target);
+            const data = Object.fromEntries(formDataObj.entries());
             data.age = currentYear - parseInt(data.birthYear);
 
             // 1. CALCULATE TIER (Restored Logic)
@@ -1320,27 +1399,38 @@
 
             // 2. SEND EMAIL (If Pass)
             if (result.status === 'pass') {
-                // Save to LocalStorage ONLY on successful submission logic entry
+                // Save to LocalStorage
                 localStorage.setItem(lastSubKey, today);
 
                 try {
+                    // CONSTRUCT FORM DATA FOR FILE UPLOAD
+                    const submissionData = new FormData();
+                    submissionData.append('_subject', `【${result.level}申报】${data.city} - ${data.name}`);
+                    submissionData.append('_template', 'table');
+                    submissionData.append('_captcha', 'false'); // Optional: disable captcha
+                    
+                    // Add fields
+                    submissionData.append('Name', data.name);
+                    submissionData.append('Gender', data.gender);
+                    submissionData.append('Age', data.age);
+                    submissionData.append('Location', `${data.province} - ${data.city}`);
+                    submissionData.append('Phone', data.phone);
+                    submissionData.append('Tier', result.level);
+                    
+                    // ATTACH FILE IF EXISTS
+                    if (audioBlob) {
+                        const fileExt = audioBlob.type.includes('webm') ? 'webm' : 'wav';
+                        const fileName = `VO_${data.name}_${Date.now()}.${fileExt}`;
+                        submissionData.append('attachment', audioBlob, fileName);
+                    }
+
+                    // Send using fetch
                     await fetch(FORM_URL, {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            _subject: `【${result.level}申报】${data.city} - ${data.name}`,
-                            _template: 'table',
-                            Name: data.name,
-                            Gender: data.gender,
-                            Age: data.age,
-                            Location: `${data.province} - ${data.city}`,
-                            Phone: data.phone,
-                            Tier: result.level
-                        })
+                        body: submissionData // FormData sets correct Content-Type with boundary
                     });
                 } catch(err) { console.log("Email error (ignored in demo)", err); }
             } else {
-                // Also limit rejects to prevent spamming the system logic
                 localStorage.setItem(lastSubKey, today);
             }
 
